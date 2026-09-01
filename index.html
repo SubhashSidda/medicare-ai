@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare AI — Unified Multilingual Healthcare & Triage Assistant</title>
+    
+    <!-- Google Identity Services API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Modular Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/modal.css">
+</head>
+<body>
+
+<!-- ================= 1. INITIAL ROLE SELECTION (LANDING SCREEN) ================= -->
+<div id="roleSelectionScreen" class="auth-wrapper">
+    <div class="selection-box">
+        <div class="logo">
+            <div class="logo-circle">✚</div>
+            <h1>MediCare <span>AI</span></h1>
+            <p data-i18n="tagline">Intelligent Clinical & Patient Workspace</p>
+        </div>
+
+        <h2 data-i18n="landing_role_question">Who are you? / మీరు ఎవరు?</h2>
+        <p class="subtitle" data-i18n="landing_role_desc">Select your portal to enter your dedicated healthcare space.</p>
+
+        <div class="portal-cards-grid">
+            <!-- Doctor Option Card -->
+            <div class="portal-card doc-portal-card" onclick="selectRoleFlow('doctor')">
+                <div class="portal-icon">👨‍⚕️</div>
+                <h3 data-i18n="doctor_portal">Doctor / Clinical Staff</h3>
+                <p data-i18n="doctor_role_card_desc">OPD Triage, Priority Queues, Voice Dictation, Red-Flag Alerts & Case Sheets</p>
+                <button class="portal-cta-btn"><span data-i18n="doctor_login_cta">Doctor Login</span> →</button>
+            </div>
+
+            <!-- Patient Option Card -->
+            <div class="portal-card pat-portal-card" onclick="selectRoleFlow('patient')">
+                <div class="portal-icon">👤</div>
+                <h3 data-i18n="patient_portal">Patient / Visitor</h3>
+                <p data-i18n="patient_role_card_desc">Describe Symptoms, Preliminary First-Aid, Prescription Records & History</p>
+                <button class="portal-cta-btn pat-cta"><span data-i18n="patient_login_cta">Patient Login</span> →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= 2. DEDICATED DOCTOR LOGIN CARD ================= -->
+<div id="doctorLoginScreen" class="auth-wrapper auth-hidden">
+    <div class="login-box doc-login-theme">
+        <button class="back-link-btn" onclick="backToRoleSelection()">← <span data-i18n="btn_back_selection">Back to Role Selection</span></button>
+        <div class="logo">
+            <div class="logo-circle">👨‍⚕️</div>
+            <h2>MediCare <span>Doctor Portal</span></h2>
+            <p data-i18n="doc_login_subtitle">Sign in to manage consultations and clinical priority queue.</p>
+        </div>
+
+        <button type="button" class="google-custom-btn" onclick="triggerGoogleLogin('doctor')">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.79l7.97-6.2z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            <span data-i18n="google_sign_in">Continue with Google Account</span>
+        </button>
+
+        <div class="divider">
+            <span data-i18n="or_divider">OR ENTER WITH DOCTOR ID</span>
+        </div>
+
+        <label data-i18n="lbl_doctor_email">Doctor Email / Registration ID</label>
+        <input id="docEmail" type="text" placeholder="doctor@medicare.ai" value="doctor@medicare.ai">
+
+        <label data-i18n="lbl_password">Password</label>
+        <input id="docPassword" type="password" placeholder="••••••" value="123456">
+
+        <button class="login-button" onclick="loginDoctor()">
+            <span data-i18n="enter_doctor_workspace">Enter Doctor Workspace</span> →
+        </button>
+        <p class="demo">Demo Doctor: doctor@medicare.ai / 123456</p>
+    </div>
+</div>
+
+<!-- ================= 3. DEDICATED PATIENT LOGIN CARD ================= -->
+<div id="patientLoginScreen" class="auth-wrapper auth-hidden">
+    <div class="login-box pat-login-theme">
+        <button class="back-link-btn" onclick="backToRoleSelection()">← <span data-i18n="btn_back_selection">Back to Role Selection</span></button>
+        <div class="logo">
+            <div class="logo-circle pat-circle">👤</div>
+            <h2>MediCare <span>Patient Space</span></h2>
+            <p data-i18n="pat_login_subtitle">Access your prescriptions, submit symptoms & get first-aid.</p>
+        </div>
+
+        <button type="button" class="google-custom-btn" onclick="triggerGoogleLogin('patient')">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.79l7.97-6.2z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            <span data-i18n="google_sign_in">Continue with Google Account</span>
+        </button>
+
+        <div class="divider">
+            <span data-i18n="or_divider">OR ENTER WITH MOBILE / ABHA</span>
+        </div>
+
+        <label data-i18n="lbl_patient_phone">Mobile Number / 14-digit ABHA ID</label>
+        <input id="patLoginPhone" type="text" placeholder="e.g. 9876543210" value="9876543210">
+
+        <label data-i18n="lbl_password">Passcode / OTP</label>
+        <input id="patLoginPassword" type="password" placeholder="••••••" value="123456">
+
+        <button class="login-button pat-button" onclick="loginPatient()">
+            <span data-i18n="enter_patient_workspace">Access Patient Space</span> →
+        </button>
+        <p class="demo">Demo Patient: 9876543210 / 123456</p>
+    </div>
+</div>
+
+<!-- ================= 4. MAIN WORKSPACE APP ================= -->
+<div id="app">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">✚</div>
+            <div>
+                <h3>MediCare AI</h3>
+                <small id="sidebarRoleTag">Doctor Portal</small>
+            </div>
+        </div>
+
+        <!-- DOCTOR SIDEBAR MENU -->
+        <div class="menu" id="doctorMenu">
+            <button class="active" onclick="page('doc-dashboard', this)">
+                🏠 <span data-i18n="menu_dashboard">Dashboard</span>
+            </button>
+            <button onclick="page('doc-triage', this)">
+                🚨 <span data-i18n="menu_triage_queue">Triage Priority Queue</span>
+            </button>
+            <button onclick="page('doc-newcase', this)">
+                📝 <span data-i18n="menu_newcase">New Clinical Case</span>
+            </button>
+            <button onclick="page('doc-patients', this)">
+                📋 <span data-i18n="menu_registry">Patient Registry</span>
+            </button>
+            <button onclick="page('doc-ai', this)">
+                ✦ <span data-i18n="menu_ai_suite">AI Assistant Suite</span>
+            </button>
+        </div>
+
+        <!-- PATIENT SIDEBAR MENU -->
+        <div class="menu" id="patientMenu" style="display:none;">
+            <button class="active" onclick="page('pat-dashboard', this)">
+                👤 <span data-i18n="menu_my_health">My Health Home</span>
+            </button>
+            <button onclick="page('pat-intake', this)">
+                📝 <span data-i18n="menu_submit_symptoms">Submit Symptoms & First-Aid</span>
+            </button>
+            <button onclick="page('pat-records', this)">
+                📑 <span data-i18n="menu_my_prescriptions">My Prescriptions</span>
+            </button>
+            <button onclick="page('pat-timeline', this)">
+                🕒 <span data-i18n="menu_health_timeline">Health Timeline</span>
+            </button>
+        </div>
+
+        <button class="logout" onclick="logout()">⇥ <span data-i18n="btn_signout">Sign Out</span></button>
+    </div>
+
+    <!-- MAIN VIEWPORT -->
+    <div class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div>
+                <h2 id="topTitle" data-i18n="header_dashboard">Dashboard</h2>
+                <p id="topSubtitle" data-i18n="subtitle_dashboard">Your clinical workspace at a glance</p>
+            </div>
+            
+            <div class="topbar-controls">
+                <div class="lang-selector-wrap">
+                    <i class="fa-solid fa-globe" style="color:#1769ff; margin-right:4px;"></i>
+                    <select id="langSelect" class="lang-select" onchange="changeLanguage()">
+                        <option value="en">English (US)</option>
+                        <option value="te">తెలుగు (Telugu)</option>
+                        <option value="hi">हिन्दी (Hindi)</option>
+                        <option value="ta">தமிழ் (Tamil)</option>
+                        <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                        <option value="ml">മലയാളം (Malayalam)</option>
+                    </select>
+                </div>
+                <div class="user-tag" id="userBadgeTag">👨‍⚕️ Dr. Sharma (OPD)</div>
+            </div>
+        </div>
+
+        <!-- ================= DOCTOR VIEWS ================= -->
+        
+        <!-- 1. DOCTOR DASHBOARD -->
+        <div id="doc-dashboard" class="page active">
+            <div class="hero">
+                <h1 data-i18n="doc_hero_title">Welcome Back, Doctor 👋</h1>
+                <p data-i18n="doc_hero_desc">
+                    Review patient symptoms, prioritize urgent queues via AI triage scoring, dictate notes hands-free, and monitor red-flag alarms.
+                </p>
+                <button onclick="page('doc-triage')">🚨 <span data-i18n="btn_view_triage_queue">Inspect Triage Priority Queue</span></button>
+            </div>
+
+            <div class="stats">
+                <div class="stat stat-critical">
+                    <div class="stat-icon">🚨</div>
+                    <p data-i18n="stat_p1_emergency">P1 Urgent Emergencies</p>
+                    <h2 id="statP1Count" style="color:#b91c1c;">0</h2>
+                </div>
+                <div class="stat stat-warning">
+                    <div class="stat-icon">⚠️</div>
+                    <p data-i18n="stat_p2_priority">P2 High Priority</p>
+                    <h2 id="statP2Count" style="color:#d97706;">0</h2>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">👥</div>
+                    <p data-i18n="stat_total_patients">Total Patients</p>
+                    <h2 id="total">0</h2>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">✓</div>
+                    <p data-i18n="stat_completed">Completed Cases</p>
+                    <h2 id="completed">0</h2>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3 data-i18n="recent_encounters">Recent Patient Encounters</h3>
+                    <p data-i18n="recent_encounters_desc">Live consultation queue and triage status</p>
+                    <div id="recent">No patient records yet.</div>
+                </div>
+
+                <div class="card">
+                    <h3 data-i18n="quick_actions">Quick Actions</h3>
+                    <p data-i18n="quick_actions_desc">Clinical workflows</p>
+                    <button class="quick" onclick="page('doc-triage')">
+                        🚨 <b><span data-i18n="btn_triage_queue">Triage Priority Queue</span></b><br>
+                        <small data-i18n="btn_triage_queue_desc">AI automated urgency ranking</small>
+                    </button>
+                    <button class="quick" onclick="page('doc-newcase')">
+                        📝 <b><span data-i18n="btn_new_intake">New Case Intake</span></b><br>
+                        <small data-i18n="btn_new_intake_desc">Voice, OCR & smart fields</small>
+                    </button>
+                    <button class="quick" onclick="page('doc-patients')">
+                        📋 <b><span data-i18n="btn_search_registry">Search Registry</span></b><br>
+                        <small data-i18n="btn_search_registry_desc">Lookup by ABHA ID or Name</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. DOCTOR SMART TRIAGE PRIORITY QUEUE -->
+        <div id="doc-triage" class="page">
+            <h2 data-i18n="triage_title">🚨 AI Smart Triage & Priority Urgency Queue</h2>
+            <p style="color:#8995a8;margin:6px 0 20px" data-i18n="triage_subtitle">
+                AI ranks incoming cases by clinical severity (P1 Emergency ➔ P2 Urgent ➔ P3 Routine) so doctors attend high-risk patients first.
+            </p>
+
+            <div class="card">
+                <div id="triageQueueList"></div>
+            </div>
+        </div>
+
+        <!-- 3. DOCTOR NEW CASE INTAKE -->
+        <div id="doc-newcase" class="page">
+            <h2 data-i18n="case_taking_title">Digital Case-Taking & Consultation</h2>
+            <p style="color:#8995a8;margin:6px 0 20px" data-i18n="case_taking_subtitle">
+                Capture structured clinical details with Voice dictation, Document OCR, and AI summarization.
+            </p>
+
+            <div class="form-card">
+                <h3 data-i18n="sec_demographics">👤 1. Patient Demographics</h3>
+                <div class="form-grid">
+                    <div>
+                        <label data-i18n="lbl_name">Patient Full Name *</label>
+                        <input id="name" placeholder="e.g. Ramesh Varma">
+                    </div>
+                    <div>
+                        <label data-i18n="lbl_age">Age *</label>
+                        <input id="age" type="number" placeholder="e.g. 45">
+                    </div>
+                    <div>
+                        <label data-i18n="lbl_gender">Gender</label>
+                        <select id="gender">
+                            <option value="Male" data-i18n="opt_male">Male</option>
+                            <option value="Female" data-i18n="opt_female">Female</option>
+                            <option value="Other" data-i18n="opt_other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label data-i18n="lbl_phone">Contact Phone / ABHA ID</label>
+                        <input id="phone" placeholder="Phone or 14-digit ABHA">
+                    </div>
+
+                    <!-- SYMPTOMS & VOICE -->
+                    <div class="full">
+                        <div class="input-header-tool">
+                            <label id="lblSymptoms" data-i18n="lbl_symptoms">Chief Complaint & Symptoms *</label>
+                            <button type="button" id="voiceBtnDoc" class="voice-btn" onclick="toggleVoice('symptoms', 'voiceBtnDoc', 'voiceStatusDoc')">
+                                🎤 <span id="voiceStatusDoc" data-i18n="btn_voice_dictate">Voice Dictate</span>
+                            </button>
+                        </div>
+                        <textarea id="symptoms" placeholder="Type or click 'Voice Dictate' to speak symptoms..."></textarea>
+                    </div>
+
+                    <div>
+                        <label data-i18n="lbl_duration">Onset & Duration</label>
+                        <input id="duration" placeholder="e.g. 3 days, acute since morning">
+                    </div>
+                    <div>
+                        <label data-i18n="lbl_severity">Triage Severity</label>
+                        <select id="severity">
+                            <option value="Mild" data-i18n="opt_mild">Mild</option>
+                            <option value="Moderate" data-i18n="opt_moderate">Moderate</option>
+                            <option value="Severe" data-i18n="opt_severe">Severe (Emergency / Red-Flag)</option>
+                        </select>
+                    </div>
+
+                    <!-- OCR UPLOAD -->
+                    <div class="full">
+                        <label data-i18n="lbl_ocr_scanner">📷 Medical Report / Prescription OCR Scanner</label>
+                        <div class="ocr-dropzone" onclick="document.getElementById('docFile').click()">
+                            <input type="file" id="docFile" style="display:none" accept="image/*" onchange="handleOCR(this, 'symptoms', 'history', 'medications', 'ocrStatusDoc')">
+                            <div>📄 <b><span data-i18n="ocr_upload_prompt">Click to Upload Prescription or Lab Report</span></b></div>
+                            <p id="ocrStatusDoc" data-i18n="ocr_upload_desc">AI will automatically extract clinical findings into form</p>
+                        </div>
+                    </div>
+
+                    <div class="full">
+                        <label data-i18n="lbl_history">Past Medical History</label>
+                        <textarea id="history" placeholder="Diabetes, Hypertension, Past surgeries, Chronic diseases..."></textarea>
+                    </div>
+                    <div class="full">
+                        <label data-i18n="lbl_meds">Current Medications</label>
+                        <textarea id="medications" placeholder="Current ongoing medicines (e.g. Metformin 500mg, Telmisartan 40mg)..."></textarea>
+                    </div>
+                    <div class="full">
+                        <label data-i18n="lbl_allergies">Known Drug Allergies</label>
+                        <textarea id="allergies" placeholder="e.g. Penicillin, Sulfa drugs, Paracetamol (Leave empty if None)..."></textarea>
+                    </div>
+                </div>
+
+                <!-- AI BOX -->
+                <div class="ai-box">
+                    <h3 data-i18n="ai_box_title">✦ AI Clinical Intelligence Layer</h3>
+                    <p data-i18n="ai_box_desc">
+                        Human-in-the-Loop: Scans for acute Red-Flags, identifies missing fields, and drafts structured summaries for doctor sign-off.
+                    </p>
+                    <button class="ai-button" onclick="generateAI('doc')">
+                        ✦ <span data-i18n="btn_generate_ai">Pre-Check & Generate AI Summary</span>
+                    </button>
+                    <div id="resultDoc" class="ai-result" style="display:none"></div>
+                </div>
+
+                <div class="form-buttons">
+                    <button class="cancel" onclick="page('doc-dashboard')" data-i18n="btn_cancel">Cancel</button>
+                    <button class="save-button" onclick="savePatient('doc')">
+                        <span data-i18n="btn_save_case">Save Patient Case</span> ✓
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. DOCTOR PATIENT REGISTRY -->
+        <div id="doc-patients" class="page">
+            <h2 data-i18n="registry_title">Patient Records Registry</h2>
+            <p style="color:#8995a8;margin:6px 0 20px" data-i18n="registry_subtitle">
+                Search, inspect clinical timelines, and review past case sheets.
+            </p>
+
+            <div class="card">
+                <input id="searchDoc" placeholder="🔍 Search patient by Name, Symptoms, ID..." onkeyup="displayPatients('doc')" style="margin-bottom:20px">
+                <div id="patientListDoc">No patient records yet.</div>
+            </div>
+        </div>
+
+        <!-- 5. DOCTOR AI SUITE SHOWCASE -->
+        <div id="doc-ai" class="page">
+            <div class="card ai-page">
+                <div class="ai-big">✦</div>
+                <h1 data-i18n="ai_suite_title">Doctor AI Clinical Suite</h1>
+                <p data-i18n="ai_suite_desc">
+                    MediCare AI provides structured intake automation, multimodal ingestion, and diagnostic red-flag detection while keeping full clinical authority with the physician.
+                </p>
+
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon">🚨</div>
+                        <h4>Smart Triage Prioritization</h4>
+                        <p>Automatically classifies patients into P1/P2/P3 queues based on symptoms and vitals.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">💡</div>
+                        <h4>Preliminary First-Aid Advisor</h4>
+                        <p>Provides patients with safe, instant do's & don'ts in 6 languages while awaiting consultation.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🎤</div>
+                        <h4 data-i18n="feat_voice_title">Voice-to-Text</h4>
+                        <p data-i18n="feat_voice_desc">Dictate notes hands-free in English, Telugu, Hindi, Tamil, Kannada, Malayalam.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ================= PATIENT VIEWS ================= -->
+
+        <!-- 1. PATIENT DASHBOARD -->
+        <div id="pat-dashboard" class="page">
+            <div class="hero pat-hero">
+                <h1 id="patWelcome" data-i18n="pat_hero_title">Welcome to Your Health Portal 👋</h1>
+                <p data-i18n="pat_hero_desc">
+                    Submit your symptoms before meeting the doctor, get immediate preliminary first-aid advice, and track your medical records.
+                </p>
+                <button onclick="page('pat-intake')">＋ <span data-i18n="btn_submit_symptoms_now">Submit Symptoms & Get First-Aid</span></button>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-icon">📑</div>
+                    <p data-i18n="pat_stat_visits">My Total Visits</p>
+                    <h2 id="patStatVisits">0</h2>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">💊</div>
+                    <p data-i18n="pat_stat_meds">Active Prescriptions</p>
+                    <h2 id="patStatMeds">0</h2>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">⚕️</div>
+                    <p data-i18n="pat_stat_allergies">Recorded Allergies</p>
+                    <h2 id="patStatAllergies">0</h2>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">🕒</div>
+                    <p data-i18n="pat_stat_last_date">Last Consultation</p>
+                    <h2 id="patStatLastDate" style="font-size:16px; margin-top:8px;">Recent</h2>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3 data-i18n="pat_recent_consultations">My Recent Consultations</h3>
+                    <p data-i18n="pat_recent_desc">Doctor reviews & clinical notes</p>
+                    <div id="patRecentList">No visits on record.</div>
+                </div>
+
+                <div class="card">
+                    <h3 data-i18n="pat_quick_tasks">Patient Quick Tasks</h3>
+                    <p data-i18n="pat_quick_tasks_desc">Manage your care</p>
+                    <button class="quick" onclick="page('pat-intake')">
+                        📝 <b><span data-i18n="btn_pat_describe">Describe Symptoms & First-Aid</span></b><br>
+                        <small data-i18n="btn_pat_describe_desc">Instant Preliminary Advice in your language</small>
+                    </button>
+                    <button class="quick" onclick="page('pat-records')">
+                        📑 <b><span data-i18n="btn_pat_prescriptions">View Prescriptions</span></b><br>
+                        <small data-i18n="btn_pat_prescriptions_desc">Check dosages & doctor instructions</small>
+                    </button>
+                    <button class="quick" onclick="page('pat-timeline')">
+                        🕒 <b><span data-i18n="btn_pat_timeline">Health Timeline</span></b><br>
+                        <small data-i18n="btn_pat_timeline_desc">Chronological visit history</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. PATIENT SELF-INTAKE & FIRST-AID ADVISORY -->
+        <div id="pat-intake" class="page">
+            <h2 data-i18n="pat_intake_title">Patient Self-Intake & Preliminary First-Aid Advisor</h2>
+            <p style="color:#8995a8;margin:6px 0 20px" data-i18n="pat_intake_subtitle">
+                Enter your symptoms to receive instant safety precautions and send prioritized details to the doctor.
+            </p>
+
+            <div class="form-card">
+                <h3 data-i18n="pat_sec_personal">👤 Personal Details</h3>
+                <div class="form-grid">
+                    <div>
+                        <label data-i18n="lbl_your_name">Your Full Name *</label>
+                        <input id="patName" placeholder="e.g. Suresh Rao" value="Suresh Rao">
+                    </div>
+                    <div>
+                        <label data-i18n="lbl_your_age">Your Age *</label>
+                        <input id="patAge" type="number" placeholder="e.g. 52" value="52">
+                    </div>
+                    <div>
+                        <label data-i18n="lbl_gender">Gender</label>
+                        <select id="patGender">
+                            <option value="Male" data-i18n="opt_male">Male</option>
+                            <option value="Female" data-i18n="opt_female">Female</option>
+                            <option value="Other" data-i18n="opt_other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label data-i18n="lbl_your_phone">Your Mobile / ABHA ID</label>
+                        <input id="patPhone" placeholder="10-digit mobile or ABHA" value="9876543210">
+                    </div>
+
+                    <!-- PATIENT SYMPTOMS WITH VOICE -->
+                    <div class="full">
+                        <div class="input-header-tool">
+                            <label id="lblPatSymptoms" data-i18n="lbl_pat_symptoms">What symptoms are you feeling? *</label>
+                            <button type="button" id="voiceBtnPat" class="voice-btn" onclick="toggleVoice('patSymptoms', 'voiceBtnPat', 'voiceStatusPat')">
+                                🎤 <span id="voiceStatusPat" data-i18n="btn_voice_speak">Speak in your language</span>
+                            </button>
+                        </div>
+                        <textarea id="patSymptoms" placeholder="Describe your symptoms (e.g. Chest pain, High fever, Vomiting, Dizziness)..."></textarea>
+                    </div>
+
+                    <div>
+                        <label data-i18n="lbl_pat_days">Since how many days?</label>
+                        <input id="patDuration" placeholder="e.g. 2 days, 1 week">
+                    </div>
+                    <div>
+                        <label data-i18n="lbl_pat_severity">Pain / Severity</label>
+                        <select id="patSeverity">
+                            <option value="Mild" data-i18n="opt_pat_mild">Mild (Normal)</option>
+                            <option value="Moderate" data-i18n="opt_pat_moderate">Moderate (Disturbing)</option>
+                            <option value="Severe" data-i18n="opt_pat_severe">Severe (Very high pain / Emergency)</option>
+                        </select>
+                    </div>
+
+                    <!-- PATIENT OCR UPLOAD -->
+                    <div class="full">
+                        <label data-i18n="lbl_pat_upload">📷 Upload Previous Doctor Slips or Lab Reports</label>
+                        <div class="ocr-dropzone" onclick="document.getElementById('patDocFile').click()">
+                            <input type="file" id="patDocFile" style="display:none" accept="image/*" onchange="handleOCR(this, 'patSymptoms', 'patHistory', 'patMeds', 'ocrStatusPat')">
+                            <div>📄 <b><span data-i18n="pat_ocr_prompt">Click to Upload Old Prescription / Report Photo</span></b></div>
+                            <p id="ocrStatusPat" data-i18n="pat_ocr_desc">AI will read and organize your health record automatically</p>
+                        </div>
+                    </div>
+
+                    <div class="full">
+                        <label data-i18n="lbl_pat_illnesses">Previous Illnesses (Diabetes, BP, Asthama etc.)</label>
+                        <textarea id="patHistory" placeholder="Any long-term disease..."></textarea>
+                    </div>
+                    <div class="full">
+                        <label data-i18n="lbl_pat_meds">Current Tablets/Medicines you are taking</label>
+                        <textarea id="patMeds" placeholder="Medicine names if you remember..."></textarea>
+                    </div>
+                    <div class="full">
+                        <label data-i18n="lbl_pat_allergies">Any known medicine allergies (e.g. Penicillin)</label>
+                        <textarea id="patAllergies" placeholder="Medicines that caused reactions..."></textarea>
+                    </div>
+                </div>
+
+                <!-- PATIENT AI PRELIMINARY FIRST-AID ADVISOR SECTION -->
+                <div class="ai-box">
+                    <h3 data-i18n="pat_ai_title">✦ AI Preliminary First-Aid & Consultation Advisor</h3>
+                    <p data-i18n="pat_ai_desc">
+                        Get instant preliminary safety do's and don'ts before your doctor appointment.
+                    </p>
+                    <button class="ai-button" onclick="generateAI('pat')">
+                        ✦ <span data-i18n="btn_pat_generate">Get AI Preliminary First-Aid & Triage Advice</span>
+                    </button>
+                    <div id="resultPat" class="ai-result" style="display:none"></div>
+                </div>
+
+                <div class="form-buttons">
+                    <button class="cancel" onclick="page('pat-dashboard')" data-i18n="btn_cancel">Cancel</button>
+                    <button class="save-button" onclick="savePatient('pat')">
+                        <span data-i18n="btn_pat_submit">Submit to Doctor Priority Queue</span> ✓
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. PATIENT RECORDS & PRESCRIPTIONS -->
+        <div id="pat-records" class="page">
+            <h2 data-i18n="pat_records_title">My Health Records & Prescriptions</h2>
+            <p style="color:#8995a8;margin:6px 0 20px" data-i18n="pat_records_subtitle">
+                All your doctor consultations, active medicines, and past reports.
+            </p>
+
+            <div class="card">
+                <input id="searchPat" placeholder="🔍 Search my records..." onkeyup="displayPatients('pat')" style="margin-bottom:20px">
+                <div id="patientListPat">No records yet.</div>
+            </div>
+        </div>
+
+        <!-- 4. PATIENT TIMELINE -->
+        <div id="pat-timeline" class="page">
+            <h2 data-i18n="pat_timeline_title">My Longitudinal Health Timeline</h2>
+            <p style="color:#8995a8;margin:6px 0 20px" data-i18n="pat_timeline_subtitle">
+                Chronological journey of your hospital visits and health improvements.
+            </p>
+            <div class="card" id="patFullTimelineBox"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= PATIENT DETAIL MODAL ================= -->
+<div id="patientModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 id="modalPatientName">Clinical Case Sheet</h3>
+            <button class="close-modal" onclick="closeModalDirect()">✕</button>
+        </div>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+<!-- ================= 5. FLOATING AI CHATBOT ASSISTANT ================= -->
+<div id="floatingChatWrapper">
+    <!-- Floating Trigger Button -->
+    <button id="floatingChatBtn" onclick="toggleChatWindow()">
+        <div class="chat-btn-inner">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span class="chat-btn-text">MediCare AI</span>
+        </div>
+        <span class="chat-online-dot"></span>
+    </button>
+
+    <!-- Floating Chat Window -->
+    <div id="floatingChatWindow" class="chat-window-hidden">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="chat-bot-avatar">🤖</div>
+                <div>
+                    <h4>MediCare AI Assistant</h4>
+                    <small>● Multilingual First-Aid & Triage Bot</small>
+                </div>
+            </div>
+            <button class="chat-close-btn" onclick="toggleChatWindow()">✕</button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg bot-msg">
+                <div class="msg-content">
+                    👋 <b>Hello! I am your MediCare AI Assistant.</b><br>
+                    You can ask me about symptoms, preliminary first-aid, or medication precautions in any of the 6 languages!
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="chat-chips">
+            <button class="chip-btn" onclick="sendQuickPrompt('What to do for chest pain?')">🚑 Chest Pain</button>
+            <button class="chip-btn" onclick="sendQuickPrompt('జ్వరం వస్తే ఏం చేయాలి?')">🌡️ High Fever</button>
+            <button class="chip-btn" onclick="sendQuickPrompt('How to use OCR scanner?')">📷 Upload Report</button>
+        </div>
+
+        <div class="chat-input-row">
+            <input type="text" id="chatInputText" placeholder="Ask symptoms or first-aid in any language..." onkeypress="handleChatKey(event)">
+            <button id="chatVoiceBtn" class="chat-action-btn" onclick="toggleChatVoice()" title="Speak in your language">🎤</button>
+            <button id="chatSendBtn" class="chat-action-btn send-btn" onclick="sendChatMessage()">➔</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modular JS Scripts -->
+<script src="js/storage.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/ocr.js"></script>
+<script src="js/ai-engine.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/chatbot.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
