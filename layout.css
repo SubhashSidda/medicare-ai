@@ -1,0 +1,121 @@
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 240px;
+    background: #101a2d;
+    color: white;
+    padding: 25px 15px;
+    z-index: 100;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 35px;
+}
+
+.brand-icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #1769ff, #12b99a);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+}
+
+.brand small { color: #8491a8; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+
+.menu button {
+    width: 100%;
+    padding: 13px 14px;
+    margin: 4px 0;
+    border: 0;
+    border-radius: 9px;
+    text-align: left;
+    background: transparent;
+    color: #aeb8c9;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.menu button:hover, .menu button.active {
+    background: #20304d;
+    color: white;
+}
+
+.logout {
+    position: absolute;
+    bottom: 25px;
+    left: 15px;
+    width: 210px;
+    padding: 12px;
+    border: 0;
+    border-radius: 9px;
+    background: #1c2a44;
+    color: white;
+    cursor: pointer;
+}
+
+.main { margin-left: 240px; }
+
+.topbar {
+    height: 75px;
+    background: white;
+    border-bottom: 1px solid #e4e9f0;
+    padding: 14px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar h2 { font-size: 19px; }
+.topbar p { color: #8995a8; font-size: 11px; margin-top: 4px; }
+
+.topbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.lang-selector-wrap {
+    display: flex;
+    align-items: center;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.lang-select {
+    padding: 6px 8px;
+    width: auto;
+    font-size: 12px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+}
+
+.user-tag {
+    background: #eaf2ff;
+    color: #1769ff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.page { display: none; padding: 30px; }
+.page.active { display: block; }
+
+@media(max-width: 800px) {
+    .sidebar { width: 70px; }
+    .brand h3, .brand small, .menu button span { display: none; }
+    .logout { width: 40px; font-size: 0; }
+    .main { margin-left: 70px; }
+}
